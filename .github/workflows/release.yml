@@ -49,6 +49,15 @@ jobs:
       - name: Run tests
         run: cargo test --locked
 
+      - name: Publish crate to crates.io
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          VERSION: ${{ steps.set_version.outputs.version }}
+        run: |
+          set -euo pipefail
+          echo "Publishing lowdown v$VERSION to crates.io"
+          cargo publish --locked
+
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
