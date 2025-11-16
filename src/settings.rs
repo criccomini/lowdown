@@ -5,7 +5,7 @@ use regex::Regex;
 use serde::Serialize;
 use tracing::warn;
 
-pub const HEADER_PREFIX: &str = "x-mikkmokk-";
+pub const HEADER_PREFIX: &str = "x-lowdown-";
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Settings {

@@ -31,7 +31,7 @@ use crate::settings::{
 use crate::state::AppState;
 use tower::Service;
 
-const DESTINATION_HEADER: &str = "x-mikkmokk-destination-url";
+const DESTINATION_HEADER: &str = "x-lowdown-destination-url";
 
 pub fn router(state: Arc<AppState>) -> Router {
     Router::new().fallback_service(ProxyService { state })
@@ -196,7 +196,7 @@ fn rewrite_forwarding(mut req: Request<Body>) -> Request<Body> {
 }
 
 fn parse_forward_target(uri: &str) -> Option<(String, String, String)> {
-    for prefix in ["/mikkmokk-fwd-", "/mikkmokk-forward-"] {
+    for prefix in ["/lowdown-fwd-", "/lowdown-forward-"] {
         if let Some(rest) = uri.strip_prefix(prefix) {
             for scheme in ["http", "https"] {
                 let marker = format!("{scheme}/");

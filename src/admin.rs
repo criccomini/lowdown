@@ -52,7 +52,7 @@ async fn add_one_off(State(state): State<Arc<AppState>>, headers: HeaderMap) -> 
     state.add_one_off(settings);
     json_response(
         StatusCode::OK,
-        &json!({"service":"mikkmokk","message":"Added one-off"}),
+        &json!({"service":"lowdown","message":"Added one-off"}),
         state.body_trailer(),
     )
 }
@@ -64,14 +64,14 @@ async fn list_headers(State(state): State<Arc<AppState>>, headers: HeaderMap) ->
         .collect();
     header_names.sort();
     for name in &header_names {
-        if name.to_ascii_lowercase().starts_with("x-mikkmokk-") {
+        if name.to_ascii_lowercase().starts_with("x-lowdown-") {
             if let Some(value) = headers.get(name) {
-                info!("x-mikkmokk- Header {name} => {:?}", value);
+                info!("x-lowdown- Header {name} => {:?}", value);
             }
         }
     }
     for name in &header_names {
-        if !name.to_ascii_lowercase().starts_with("x-mikkmokk-") {
+        if !name.to_ascii_lowercase().starts_with("x-lowdown-") {
             if let Some(value) = headers.get(name) {
                 info!("Other header {name} => {:?}", value);
             }
@@ -83,7 +83,7 @@ async fn list_headers(State(state): State<Arc<AppState>>, headers: HeaderMap) ->
 async fn service_root(State(state): State<Arc<AppState>>) -> Response<Body> {
     json_response(
         StatusCode::OK,
-        &json!({"service":"mikkmokk"}),
+        &json!({"service":"lowdown"}),
         state.body_trailer(),
     )
 }
@@ -91,7 +91,7 @@ async fn service_root(State(state): State<Arc<AppState>>) -> Response<Body> {
 async fn health(State(state): State<Arc<AppState>>) -> Response<Body> {
     json_response(
         StatusCode::OK,
-        &json!({"service":"mikkmokk","status":"healthy"}),
+        &json!({"service":"lowdown","status":"healthy"}),
         state.body_trailer(),
     )
 }

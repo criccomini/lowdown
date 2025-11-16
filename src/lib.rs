@@ -22,7 +22,7 @@ use tokio::net::TcpListener;
 pub async fn run() -> anyhow::Result<()> {
     let config = server_config_from_env()?;
     let env_layer = SettingsLayer::from_env();
-    let development_trailer = if std::env::var("MIKKMOKK_DEVELOPMENT")
+    let development_trailer = if std::env::var("LOWDOWN_DEVELOPMENT")
         .map(|v| v.eq_ignore_ascii_case("true"))
         .unwrap_or(false)
     {

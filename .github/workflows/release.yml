@@ -60,7 +60,7 @@ jobs:
         env:
           VERSION: ${{ steps.verify_version.outputs.version }}
         run: |
-          IMAGE="ghcr.io/${{ github.repository_owner }}/mikkmokk-proxy"
+          IMAGE="ghcr.io/${{ github.repository_owner }}/lowdown"
           echo "Building image $IMAGE:$VERSION"
           docker build --tag "$IMAGE:$VERSION" --tag "$IMAGE:latest" .
           docker push "$IMAGE:$VERSION"
@@ -96,4 +96,3 @@ jobs:
               --title "$TAG" \
               --notes "Release $TAG"
           fi
-

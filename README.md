@@ -1,7 +1,7 @@
-# mikkmokk-proxy (Rust implementation)
+# lowdown
 
-This is a Rust reimplementation of
-[`ivarref/mikkmokk-proxy`](https://github.com/ivarref/mikkmokk-proxy): an
+This is a Rust reimplementation (inspired by
+[`ivarref/mikkmokk-proxy`](https://github.com/ivarref/mikkmokk-proxy)) of an
 unobtrusive reverse HTTP proxy that can inject faults between a client and a
 backend service.
 
@@ -47,20 +47,20 @@ You must either:
   ```
 
 - or use the path-based forwarding endpoints
-  (`/mikkmokk-forward-http/...`, see below).
+  (`/lowdown-forward-http/...`, see below).
 
 ### Run via Docker
 
 Build:
 
 ```bash
-docker build -t mikkmokk-proxy .
+docker build -t lowdown .
 ```
 
 Run (simple example, proxying to `http://example.com`):
 
 ```bash
-docker run --rm --name mikkmokk-proxy \
+docker run --rm --name lowdown \
   -e DESTINATION_URL=http://example.com \
   -e PROXY_BIND=0.0.0.0 \
   -e PROXY_PORT=8080 \
@@ -68,7 +68,7 @@ docker run --rm --name mikkmokk-proxy \
   -e ADMIN_PORT=7070 \
   -p 8080:8080 \
   -p 7070:7070 \
-  mikkmokk-proxy
+  lowdown
 ```
 
 Now:
@@ -109,7 +109,7 @@ There are three layers of configuration, applied in this order:
 1. **Built-in defaults** (hard-coded)
 2. **Environment variables** (process-level defaults)
 3. **Admin overrides** (mutable at runtime via admin API)
-4. **Per-request overrides** (via `x-mikkmokk-*` headers)
+4. **Per-request overrides** (via `x-lowdown-*` headers)
 
 At request time, a snapshot of the effective settings is built by merging these
 layers. Additionally, **one-off rules** can consume themselves the first time a
@@ -147,12 +147,12 @@ Semantics:
 
 ---
 
-## Per-request headers (`x-mikkmokk-*`)
+## Per-request headers (`x-lowdown-*`)
 
 When sending a request through the proxy, you can control its behavior using
 headers:
 
-- Actual HTTP header name: `x-mikkmokk-<setting-name>`
+- Actual HTTP header name: `x-lowdown-<setting-name>`
 - Where `<setting-name>` is one of the keys above (e.g. `fail-before-percentage`)
 
 Examples:
@@ -161,8 +161,8 @@ Examples:
 
   ```bash
   curl -v \
-    -H 'x-mikkmokk-destination-url: http://example.com' \
-    -H 'x-mikkmokk-fail-before-percentage: 100' \
+    -H 'x-lowdown-destination-url: http://example.com' \
+    -H 'x-lowdown-fail-before-percentage: 100' \
     http://localhost:8080/
   ```
 
@@ -170,9 +170,9 @@ Examples:
 
   ```bash
   curl -v \
-    -H 'x-mikkmokk-destination-url: http://example.com' \
-    -H 'x-mikkmokk-delay-before-percentage: 100' \
-    -H 'x-mikkmokk-delay-before-ms: 3000' \
+    -H 'x-lowdown-destination-url: http://example.com' \
+    -H 'x-lowdown-delay-before-percentage: 100' \
+    -H 'x-lowdown-delay-before-ms: 3000' \
     http://localhost:8080/
   ```
 
@@ -180,8 +180,8 @@ Examples:
 
   ```bash
   curl -v \
-    -H 'x-mikkmokk-destination-url: http://example.com' \
-    -H 'x-mikkmokk-duplicate-percentage: 100' \
+    -H 'x-lowdown-destination-url: http://example.com' \
+    -H 'x-lowdown-duplicate-percentage: 100' \
     http://localhost:8080/
   ```
 
@@ -238,7 +238,7 @@ Special non-behavior env vars:
 - `PROXY_PORT`: proxy port (default `8080`)
 - `ADMIN_BIND`: IP/host to bind the admin server (default `127.0.0.1`)
 - `ADMIN_PORT`: admin port (default `7070`)
-- `MIKKMOKK_DEVELOPMENT`: if set to `true`, JSON responses include a trailing
+- `LOWDOWN_DEVELOPMENT`: if set to `true`, JSON responses include a trailing
   newline to make terminal output nicer
 - `TZ`: timezone for timestamps in logs (e.g. `Europe/Oslo`), depends on
   system support
@@ -250,25 +250,25 @@ Special non-behavior env vars:
 You do **not** need a dedicated instance per backend. Instead, you can route to
 arbitrary hosts using special path prefixes:
 
-- `GET /mikkmokk-forward-http/{host}` → forwards to `http://{host}/`
-- `GET /mikkmokk-forward-http/{host}/{path...}` → forwards to
+- `GET /lowdown-forward-http/{host}` → forwards to `http://{host}/`
+- `GET /lowdown-forward-http/{host}/{path...}` → forwards to
   `http://{host}/{path...}`
-- `GET /mikkmokk-forward-https/{host}/{path...}` → forwards to
+- `GET /lowdown-forward-https/{host}/{path...}` → forwards to
   `https://{host}/{path...}`
 
 Examples:
 
 ```bash
 # Plain HTTP
-curl http://localhost:8080/mikkmokk-forward-http/example.org/
+curl http://localhost:8080/lowdown-forward-http/example.org/
 
 # HTTPS with path
-curl http://localhost:8080/mikkmokk-forward-https/example.org/api/health
+curl http://localhost:8080/lowdown-forward-https/example.org/api/health
 ```
 
-Internally, the proxy converts these paths into a `x-mikkmokk-destination-url`
+Internally, the proxy converts these paths into a `x-lowdown-destination-url`
 header and a normalized request URI, so they behave exactly like explicit
-`x-mikkmokk-destination-url` usage.
+`x-lowdown-destination-url` usage.
 
 ---
 
@@ -298,14 +298,14 @@ The admin API runs on the `ADMIN_BIND:ADMIN_PORT` address (default
 ### `POST /api/v1/update`
 
 Merge new defaults into the current admin settings, using the same
-`x-mikkmokk-*` header schema.
+`x-lowdown-*` header schema.
 
 Example:
 
 ```bash
 curl -XPOST \
-  -H 'x-mikkmokk-fail-before-percentage: 20' \
-  -H 'x-mikkmokk-destination-url: http://example.com' \
+  -H 'x-lowdown-fail-before-percentage: 20' \
+  -H 'x-lowdown-destination-url: http://example.com' \
   http://localhost:7070/api/v1/update
 ```
 
@@ -341,7 +341,7 @@ Example: fail the next request before reaching the backend:
 
 ```bash
 curl -XPOST \
-  -H 'x-mikkmokk-fail-before-percentage: 100' \
+  -H 'x-lowdown-fail-before-percentage: 100' \
   http://localhost:7070/api/v1/one-off
 ```
 
@@ -355,7 +355,7 @@ settings at the time the rule is consumed.
 
 ### `POST /api/v1/list-headers`
 
-Log all incoming headers (splitting `x-mikkmokk-*` and non-mikkmokk headers)
+Log all incoming headers (splitting `x-lowdown-*` and non-lowdown headers)
 and return a JSON array of header names. This is useful for introspecting what
 your gateway or client is actually sending.
 
@@ -365,8 +365,8 @@ curl -XPOST -H 'X-Foo: Bar' http://localhost:7070/api/v1/list-headers
 
 ### Service/health endpoints
 
-- `GET /` → `{"service":"mikkmokk"}`
-- `GET /health` and `GET /healthcheck` → `{"service":"mikkmokk","status":"healthy"}`
+- `GET /` → `{"service":"lowdown"}`
+- `GET /health` and `GET /healthcheck` → `{"service":"lowdown","status":"healthy"}`
 
 These are primarily for simple health and discovery checks.
 
@@ -379,7 +379,7 @@ Logging is handled via `tracing` and `tracing-subscriber`.
 - Configure via `RUST_LOG`, e.g.:
 
   ```bash
-  RUST_LOG=info,mikkmokk_proxy=debug
+  RUST_LOG=info,lowdown=debug
   ```
 
 - You will see logs for:

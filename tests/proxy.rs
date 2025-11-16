@@ -141,7 +141,7 @@ fn json_ok() -> ProxiedResponse {
 
 fn destination_header() -> (HeaderName, HeaderValue) {
     (
-        HeaderName::from_static("x-mikkmokk-destination-url"),
+        HeaderName::from_static("x-lowdown-destination-url"),
         HeaderValue::from_static("http://example.com"),
     )
 }
@@ -167,7 +167,7 @@ async fn basic_proxy_flow() {
 async fn forwarding_rewrites_destination() {
     let harness = TestHarness::new();
     harness.client.enqueue(json_ok());
-    let request = request_builder(Method::GET, "/mikkmokk-forward-http/example.org/api")
+    let request = request_builder(Method::GET, "/lowdown-forward-http/example.org/api")
         .body(Body::empty())
         .unwrap();
     let response = harness.proxy_call(request).await;
@@ -185,7 +185,7 @@ async fn fail_before_prevents_outbound_request() {
     let (header_name, header_value) = destination_header();
     let request = request_builder(Method::GET, "/")
         .header(header_name.clone(), header_value.clone())
-        .header("x-mikkmokk-fail-before-percentage", "100")
+        .header("x-lowdown-fail-before-percentage", "100")
         .body(Body::empty())
         .unwrap();
     let response = harness.proxy_call(request).await;
@@ -200,7 +200,7 @@ async fn fail_after_returns_custom_status() {
     let (header_name, header_value) = destination_header();
     let request = request_builder(Method::GET, "/")
         .header(header_name.clone(), header_value.clone())
-        .header("x-mikkmokk-fail-after-percentage", "100")
+        .header("x-lowdown-fail-after-percentage", "100")
         .body(Body::empty())
         .unwrap();
     let response = harness.proxy_call(request).await;
@@ -223,7 +223,7 @@ async fn duplicate_requests_are_sent() {
     let (header_name, header_value) = destination_header();
     let request = request_builder(Method::GET, "/")
         .header(header_name.clone(), header_value.clone())
-        .header("x-mikkmokk-duplicate-percentage", "100")
+        .header("x-lowdown-duplicate-percentage", "100")
         .body(Body::empty())
         .unwrap();
     let _ = harness.proxy_call(request).await;
@@ -237,8 +237,8 @@ async fn admin_update_and_reset_affect_defaults() {
     harness
         .admin_call(
             request_builder(Method::POST, "/api/v1/update")
-                .header("x-mikkmokk-fail-before-percentage", "100")
-                .header("x-mikkmokk-destination-url", "http://example.com")
+                .header("x-lowdown-fail-before-percentage", "100")
+                .header("x-lowdown-destination-url", "http://example.com")
                 .body(Body::empty())
                 .unwrap(),
         )
@@ -281,7 +281,7 @@ async fn one_off_is_consumed_once() {
     harness
         .admin_call(
             request_builder(Method::POST, "/api/v1/one-off")
-                .header("x-mikkmokk-fail-before-percentage", "100")
+                .header("x-lowdown-fail-before-percentage", "100")
                 .body(Body::empty())
                 .unwrap(),
         )
@@ -316,9 +316,9 @@ async fn header_matching() {
     let match_builder = || {
         request_builder(Method::GET, "/")
             .header(header_name.clone(), header_value.clone())
-            .header("x-mikkmokk-match-header-name", "x-user-id")
-            .header("x-mikkmokk-match-header-value", "abc")
-            .header("x-mikkmokk-fail-before-percentage", "100")
+            .header("x-lowdown-match-header-name", "x-user-id")
+            .header("x-lowdown-match-header-value", "abc")
+            .header("x-lowdown-fail-before-percentage", "100")
     };
     let success = harness
         .proxy_call(match_builder().body(Body::empty()).unwrap())
@@ -342,8 +342,8 @@ async fn delay_before_introduces_latency() {
     let (header_name, header_value) = destination_header();
     let request = request_builder(Method::GET, "/")
         .header(header_name.clone(), header_value.clone())
-        .header("x-mikkmokk-delay-before-percentage", "100")
-        .header("x-mikkmokk-delay-before-ms", "75")
+        .header("x-lowdown-delay-before-percentage", "100")
+        .header("x-lowdown-delay-before-ms", "75")
         .body(Body::empty())
         .unwrap();
     let start = Instant::now();
