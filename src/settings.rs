@@ -231,8 +231,8 @@ impl SettingsLayer {
         let mut layer = SettingsLayer::default();
         for (name, value) in headers.iter() {
             let key = name.as_str().to_ascii_lowercase();
-            if let Some(stripped) = key.strip_prefix(HEADER_PREFIX) {
-                if let Ok(text) = value.to_str() {
+            if let Some(stripped) = key.strip_prefix(HEADER_PREFIX)
+                && let Ok(text) = value.to_str() {
                     match stripped {
                         "fail-before-code" => layer.fail_before_code = text.parse().ok(),
                         "fail-before-percentage" => {
@@ -264,7 +264,6 @@ impl SettingsLayer {
                         _ => {}
                     }
                 }
-            }
         }
         layer
     }

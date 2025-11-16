@@ -64,18 +64,16 @@ async fn list_headers(State(state): State<Arc<AppState>>, headers: HeaderMap) ->
         .collect();
     header_names.sort();
     for name in &header_names {
-        if name.to_ascii_lowercase().starts_with("x-lowdown-") {
-            if let Some(value) = headers.get(name) {
+        if name.to_ascii_lowercase().starts_with("x-lowdown-")
+            && let Some(value) = headers.get(name) {
                 info!("x-lowdown- Header {name} => {:?}", value);
             }
-        }
     }
     for name in &header_names {
-        if !name.to_ascii_lowercase().starts_with("x-lowdown-") {
-            if let Some(value) = headers.get(name) {
+        if !name.to_ascii_lowercase().starts_with("x-lowdown-")
+            && let Some(value) = headers.get(name) {
                 info!("Other header {name} => {:?}", value);
             }
-        }
     }
     json_response(StatusCode::OK, &json!(header_names), state.body_trailer())
 }
