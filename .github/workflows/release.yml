@@ -27,28 +27,24 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Verify version matches Cargo.toml
-        id: verify_version
+      - name: Update Cargo.toml version
+        id: set_version
+        env:
+          VERSION: ${{ github.event.inputs.version }}
         run: |
-          INPUT_VERSION="${{ github.event.inputs.version }}"
-          CRATE_VERSION=$(cargo metadata --no-deps --format-version 1 \
-            | jq -r '.packages[] | select(.name=="lowdown") | .version')
+          set -euo pipefail
 
-          echo "Input version: $INPUT_VERSION"
-          echo "Crate version: $CRATE_VERSION"
-
-          if [ -z "$CRATE_VERSION" ]; then
-            echo "Could not determine crate version from Cargo metadata."
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "Version must look like 0.1.0 (got '$VERSION')."
             exit 1
           fi
 
-          if [ "$INPUT_VERSION" != "$CRATE_VERSION" ]; then
-            echo "Error: input version ($INPUT_VERSION) does not match Cargo.toml version ($CRATE_VERSION)."
-            echo "Please bump Cargo.toml to the desired version and re-run the workflow."
-            exit 1
-          fi
+          echo "Bumping Cargo.toml version to $VERSION"
 
-          echo "version=$INPUT_VERSION" >> "$GITHUB_OUTPUT"
+          sed -i.bak -E 's/^version = "[^"]+"/version = "'"$VERSION"'"/' Cargo.toml
+          rm Cargo.toml.bak
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Run tests
         run: cargo test --locked
@@ -58,7 +54,7 @@ jobs:
 
       - name: Build and push Docker image
         env:
-          VERSION: ${{ steps.verify_version.outputs.version }}
+          VERSION: ${{ steps.set_version.outputs.version }}
         run: |
           IMAGE="ghcr.io/${{ github.repository_owner }}/lowdown"
           echo "Building image $IMAGE:$VERSION"
@@ -66,9 +62,22 @@ jobs:
           docker push "$IMAGE:$VERSION"
           docker push "$IMAGE:latest"
 
+      - name: Commit version bump
+        env:
+          VERSION: ${{ steps.set_version.outputs.version }}
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -am "Release v$VERSION"
+            git push
+          fi
+
       - name: Create git tag
         env:
-          VERSION: ${{ steps.verify_version.outputs.version }}
+          VERSION: ${{ steps.set_version.outputs.version }}
         run: |
           TAG="v$VERSION"
 
@@ -84,7 +93,7 @@ jobs:
 
       - name: Create GitHub Release
         env:
-          VERSION: ${{ steps.verify_version.outputs.version }}
+          VERSION: ${{ steps.set_version.outputs.version }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="v$VERSION"
