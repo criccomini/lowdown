@@ -2,6 +2,8 @@
 name = "lowdown"
 version = "0.1.0"
 edition = "2024"
+description = "An unobtrusive reverse HTTP proxy that injects faults between a client and backend service."
+license = "MIT"
 
 [lib]
 name = "lowdown"
