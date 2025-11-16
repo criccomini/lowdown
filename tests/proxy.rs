@@ -25,10 +25,8 @@ use tower::util::ServiceExt;
 
 #[derive(Clone)]
 struct RecordedRequest {
-    method: Method,
     url: String,
     headers: HeaderMap,
-    body: Bytes,
 }
 
 struct StubClient {
@@ -57,10 +55,8 @@ impl StubClient {
 impl HttpClient for StubClient {
     async fn execute(&self, request: OutgoingRequest) -> Result<ProxiedResponse, HttpClientError> {
         self.recorded.lock().push(RecordedRequest {
-            method: request.method.clone(),
             url: request.url.clone(),
             headers: request.headers.clone(),
-            body: request.body.clone(),
         });
         let response = self.responses.lock().pop_front().unwrap_or_else(|| {
             ProxiedResponse::new(StatusCode::OK, HeaderMap::new(), Bytes::from_static(b"ok"))
@@ -104,22 +100,16 @@ impl TestHarness {
 
 struct ResponseParts {
     status: StatusCode,
-    headers: HeaderMap,
     body: Bytes,
 }
 
 impl ResponseParts {
     async fn from(response: axum::http::Response<Body>) -> Self {
         let status = response.status();
-        let headers = response.headers().clone();
         let body = body::to_bytes(response.into_body(), usize::MAX)
             .await
             .unwrap();
-        Self {
-            status,
-            headers,
-            body,
-        }
+        Self { status, body }
     }
 
     fn json(&self) -> Value {

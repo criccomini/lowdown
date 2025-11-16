@@ -206,25 +206,25 @@ impl SettingsLayer {
     }
 
     pub fn from_env() -> Self {
-        let mut layer = SettingsLayer::default();
-        layer.fail_before_code = parse_env_u16("FAIL_BEFORE_CODE");
-        layer.fail_before_percentage = parse_env_u8("FAIL_BEFORE_PERCENTAGE");
-        layer.fail_after_percentage = parse_env_u8("FAIL_AFTER_PERCENTAGE");
-        layer.fail_after_code = parse_env_u16("FAIL_AFTER_CODE");
-        layer.duplicate_percentage = parse_env_u8("DUPLICATE_PERCENTAGE");
-        layer.delay_before_percentage = parse_env_u8("DELAY_BEFORE_PERCENTAGE");
-        layer.delay_before_ms = parse_env_u64("DELAY_BEFORE_MS");
-        layer.delay_after_percentage = parse_env_u8("DELAY_AFTER_PERCENTAGE");
-        layer.delay_after_ms = parse_env_u64("DELAY_AFTER_MS");
-        layer.match_uri = env_string("MATCH_URI");
-        layer.match_uri_regex = env_string("MATCH_URI_REGEX");
-        layer.match_method = env_string("MATCH_METHOD");
-        layer.match_uri_starts_with = env_string("MATCH_URI_STARTS_WITH");
-        layer.match_host = env_string("MATCH_HOST");
-        layer.match_header_name = env_string("MATCH_HEADER_NAME").map(|v| v.to_ascii_lowercase());
-        layer.match_header_value = env_string("MATCH_HEADER_VALUE");
-        layer.destination_url = env_string("DESTINATION_URL");
-        layer
+        SettingsLayer {
+            fail_before_code: parse_env_u16("FAIL_BEFORE_CODE"),
+            fail_before_percentage: parse_env_u8("FAIL_BEFORE_PERCENTAGE"),
+            fail_after_percentage: parse_env_u8("FAIL_AFTER_PERCENTAGE"),
+            fail_after_code: parse_env_u16("FAIL_AFTER_CODE"),
+            duplicate_percentage: parse_env_u8("DUPLICATE_PERCENTAGE"),
+            delay_before_percentage: parse_env_u8("DELAY_BEFORE_PERCENTAGE"),
+            delay_before_ms: parse_env_u64("DELAY_BEFORE_MS"),
+            delay_after_percentage: parse_env_u8("DELAY_AFTER_PERCENTAGE"),
+            delay_after_ms: parse_env_u64("DELAY_AFTER_MS"),
+            match_uri: env_string("MATCH_URI"),
+            match_uri_regex: env_string("MATCH_URI_REGEX"),
+            match_method: env_string("MATCH_METHOD"),
+            match_uri_starts_with: env_string("MATCH_URI_STARTS_WITH"),
+            match_host: env_string("MATCH_HOST"),
+            match_header_name: env_string("MATCH_HEADER_NAME").map(|v| v.to_ascii_lowercase()),
+            match_header_value: env_string("MATCH_HEADER_VALUE"),
+            destination_url: env_string("DESTINATION_URL"),
+        }
     }
 
     pub fn from_headers(headers: &HeaderMap) -> Self {

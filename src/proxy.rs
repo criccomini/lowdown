@@ -218,6 +218,7 @@ fn parse_forward_target(uri: &str) -> Option<(String, String, String)> {
     None
 }
 
+#[allow(clippy::result_large_err)]
 fn build_destination_headers(
     headers: &HeaderMap,
     destination: &Destination,
@@ -377,6 +378,7 @@ struct Destination {
 }
 
 impl Destination {
+    #[allow(clippy::result_large_err)]
     fn parse(url: &str, trailer: &str) -> Result<Self, Response<Body>> {
         match Url::parse(url) {
             Ok(parsed) => {
