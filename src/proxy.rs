@@ -241,10 +241,11 @@ fn build_destination_headers(
 fn rewrite_response_headers(response: &mut ProxiedResponse, client_origin: Option<HeaderValue>) {
     if let Some(origin) = client_origin
         && response.headers.contains_key(ACCESS_CONTROL_ALLOW_ORIGIN)
-            && let Ok(value) = HeaderValue::from_bytes(origin.as_bytes()) {
-                response.headers.insert(ACCESS_CONTROL_ALLOW_ORIGIN, value);
-                debug!("Rewriting access-control-allow-origin for proxied response");
-            }
+        && let Ok(value) = HeaderValue::from_bytes(origin.as_bytes())
+    {
+        response.headers.insert(ACCESS_CONTROL_ALLOW_ORIGIN, value);
+        debug!("Rewriting access-control-allow-origin for proxied response");
+    }
 }
 
 fn select_response(first: ProxiedResponse, second: Option<ProxiedResponse>) -> ProxiedResponse {

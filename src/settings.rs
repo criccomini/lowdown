@@ -232,38 +232,31 @@ impl SettingsLayer {
         for (name, value) in headers.iter() {
             let key = name.as_str().to_ascii_lowercase();
             if let Some(stripped) = key.strip_prefix(HEADER_PREFIX)
-                && let Ok(text) = value.to_str() {
-                    match stripped {
-                        "fail-before-code" => layer.fail_before_code = text.parse().ok(),
-                        "fail-before-percentage" => {
-                            layer.fail_before_percentage = text.parse().ok()
-                        }
-                        "fail-after-percentage" => layer.fail_after_percentage = text.parse().ok(),
-                        "fail-after-code" => layer.fail_after_code = text.parse().ok(),
-                        "duplicate-percentage" => layer.duplicate_percentage = text.parse().ok(),
-                        "delay-before-percentage" => {
-                            layer.delay_before_percentage = text.parse().ok()
-                        }
-                        "delay-before-ms" => layer.delay_before_ms = text.parse().ok(),
-                        "delay-after-percentage" => {
-                            layer.delay_after_percentage = text.parse().ok()
-                        }
-                        "delay-after-ms" => layer.delay_after_ms = text.parse().ok(),
-                        "match-uri" => layer.match_uri = Some(text.to_string()),
-                        "match-uri-regex" => layer.match_uri_regex = Some(text.to_string()),
-                        "match-method" => layer.match_method = Some(text.to_string()),
-                        "match-uri-starts-with" => {
-                            layer.match_uri_starts_with = Some(text.to_string())
-                        }
-                        "match-host" => layer.match_host = Some(text.to_string()),
-                        "match-header-name" => {
-                            layer.match_header_name = Some(text.to_ascii_lowercase())
-                        }
-                        "match-header-value" => layer.match_header_value = Some(text.to_string()),
-                        "destination-url" => layer.destination_url = Some(text.to_string()),
-                        _ => {}
+                && let Ok(text) = value.to_str()
+            {
+                match stripped {
+                    "fail-before-code" => layer.fail_before_code = text.parse().ok(),
+                    "fail-before-percentage" => layer.fail_before_percentage = text.parse().ok(),
+                    "fail-after-percentage" => layer.fail_after_percentage = text.parse().ok(),
+                    "fail-after-code" => layer.fail_after_code = text.parse().ok(),
+                    "duplicate-percentage" => layer.duplicate_percentage = text.parse().ok(),
+                    "delay-before-percentage" => layer.delay_before_percentage = text.parse().ok(),
+                    "delay-before-ms" => layer.delay_before_ms = text.parse().ok(),
+                    "delay-after-percentage" => layer.delay_after_percentage = text.parse().ok(),
+                    "delay-after-ms" => layer.delay_after_ms = text.parse().ok(),
+                    "match-uri" => layer.match_uri = Some(text.to_string()),
+                    "match-uri-regex" => layer.match_uri_regex = Some(text.to_string()),
+                    "match-method" => layer.match_method = Some(text.to_string()),
+                    "match-uri-starts-with" => layer.match_uri_starts_with = Some(text.to_string()),
+                    "match-host" => layer.match_host = Some(text.to_string()),
+                    "match-header-name" => {
+                        layer.match_header_name = Some(text.to_ascii_lowercase())
                     }
+                    "match-header-value" => layer.match_header_value = Some(text.to_string()),
+                    "destination-url" => layer.destination_url = Some(text.to_string()),
+                    _ => {}
                 }
+            }
         }
         layer
     }
